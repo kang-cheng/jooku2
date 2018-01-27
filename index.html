@@ -19,9 +19,7 @@
       return window.getComputedStyle(ele)
     }
     function resetUI (isInit) {
-      if (isAncientBrowser) {
-        if (isInit) window.addEventListener("resize", resetUI)
-      }
+      if (isInit) window.addEventListener("resize", resetUI)
       var vw = parseInt(cs(posterDOM).width)
       var ratio = 4535 / 2551
       var vh = vw * ratio
@@ -38,7 +36,9 @@
 
     var isAncientBrowser = cs(posterDOM).height === '0px'
     console.log('Is ancient browser?', isAncientBrowser)
-    resetUI(true)
+    if (isAncientBrowser) {
+      resetUI(true)
+    }
 
 
     var config = {
