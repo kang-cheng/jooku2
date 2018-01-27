@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jooku</title>
+  <link rel="stylesheet" type="text/css" href="static/css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="static/css/style.css">
+  <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
+</head>
+<body>
+  <div id="poster">
+    <span id="saving"></span>
+    <img id="icon">
+    <span id="icon-name"></span>
+  </div>
+  <script>
+    function cs(ele) {
+      return window.getComputedStyle(ele)
+    }
+    function resetUI (isInit) {
+      if (isAncientBrowser) {
+        if (isInit) window.addEventListener("resize", resetUI)
+      }
+      var vw = parseInt(cs(posterDOM).width)
+      var ratio = 4535 / 2551
+      var vh = vw * ratio
+
+      posterDOM.style.height = vh + 'px'
+      iconDOM.style.width = 0.4 * vh + 'px'
+      iconDOM.style.height = 0.4 * vh + 'px'
+    }
+
+    const posterDOM = document.getElementById('poster')
+    const savingDOM = document.getElementById('saving')
+    const iconDOM = document.getElementById('icon')
+    const iconNameDOM = document.getElementById('icon-name')
+
+    var isAncientBrowser = cs(posterDOM).height === '0px'
+    console.log('Is ancient browser?', isAncientBrowser)
+    resetUI(true)
+
+
+    var config = {
+      apiKey: "AIzaSyBL9qLwyeg0DMSyI1EnQJjdwSVrcYEFErY",
+      databaseURL: "https://jooku-5e3a7.firebaseio.com"
+    };
+    firebase.initializeApp(config);
+    firebase.database().ref('promotion-new').on('value', function (snapshot) {
+      const val = snapshot.val() || ''
+      if (typeof val !== 'object') {
+        posterDOM.style.backgroundImage = 'url(./static/images/preset'+parseInt(val)+'.png)'
+        savingDOM.style.display = 'none'
+        iconDOM.style.display = 'none'
+        iconNameDOM.style.display = 'none'
+      } else {
+        posterDOM.style.backgroundImage = 'url(./static/images/'+val.background+'.png)'
+        iconDOM.src = './static/images/'+val.name.replace(/ /g,'')+'.png'
+        savingDOM.innerHTML = val.type === 'department' ? 'SAVE UP TO '+val.value+'%' : 'FROM £'+val.value
+        iconNameDOM.innerHTML = val.name
+        savingDOM.style.display = 'block'
+        iconDOM.style.display = 'block'
+        iconNameDOM.style.display = 'block'
+      }
+    })
+  </script>
+</body>
+</html>
